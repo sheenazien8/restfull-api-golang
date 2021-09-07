@@ -1,7 +1,9 @@
 package models
 
 import (
+  "fmt"
   "example.com/schools/pkg/config"
+  "example.com/schools/pkg/utilities"
   "golang.org/x/crypto/bcrypt"
 )
 
@@ -17,6 +19,42 @@ type User struct {
 }
 
 var Users []User
+
+func GetAllUserByRoles(role string) ([]User, error) {
+  exists := utilities.InArray(role, []string{"student", "staff", "teacher"})
+  if !exists {
+    return nil, fmt.Errorf("role "+ role +" is not defined in system")
+  }
+  db := config.ConnectToDB()
+  result, err := db.Query("SELECT * FROM users where roles=?", role)
+  if err != nil {
+    return nil, err
+  }
+  user := User{}
+  if err != nil {
+    panic(err.Error())
+  }
+  var response = Users
+  var count = 0
+  for result.Next() {
+    count += 1
+    result.Scan(
+      &user.Id,
+      &user.Roles,
+      &user.DescriptionRoles,
+      &user.Username,
+      &user.Password,
+      &user.NickName,
+      &user.FullName,
+      &user.Nis,
+    )
+    response = append(response, user)
+  }
+  defer db.Close()
+ 
+  return response, nil
+}
+
 
 func GetAllUser() []User {
   Users = []User{

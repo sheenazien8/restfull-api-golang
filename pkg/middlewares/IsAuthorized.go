@@ -24,7 +24,7 @@ func IsAuthorized(next http.Handler) http.Handler {
 
       if err != nil {
 	w.WriteHeader(401)
-	fmt.Fprintf(w, `{"messages": "Token not provided"}`)
+	fmt.Fprintf(w, `{"messages": "Token is expired"}`)
       }
       if token.Valid {
 	next.ServeHTTP(w, r)

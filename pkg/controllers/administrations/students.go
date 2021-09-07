@@ -29,7 +29,22 @@ func RegisterStudents(writer http.ResponseWriter, request *http.Request) {
   writer.Write(response)
 }
 
-
 func GetAllStudents(writer http.ResponseWriter, request *http.Request) {
-  writer.Write([]byte(`{"messages": "Yay"}`))
+  users, err := models.GetAllUserByRoles("student")
+  writer.Header().Set("Content-Type", "application/json; charset=UTF-8")
+  writer.WriteHeader(http.StatusBadRequest)
+  if err != nil {
+    writer.Write([]byte(`{"messages": "`+ err.Error() +`"}`))
+    return
+  }
+  response, err := json.Marshal(users)
+  if err != nil {
+    writer.Write([]byte(`{"messages": "`+ err.Error() +`"}`))
+    return
+  }
+  writer.WriteHeader(http.StatusOK)
+  writer.Write(response)
+}
+
+func GetStudents(writer http.ResponseWriter, request *http.Request) {
 }
